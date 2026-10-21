@@ -76,6 +76,8 @@
     return s;
   }
   function inp(val, on, props) { const i = h('input', Object.assign({ class: 'in', value: val == null ? '' : val }, props || {})); i.addEventListener('input', () => on(i.value, i)); return i; }
+  /* Numbered 'what to do on this tab' strip. */
+  function howTo(steps, aside) { return h('div', { class: 'howto' }, steps.map((s, i) => h('div', { class: 'ht' }, h('span', { class: 'htn' }, String(i + 1)), h('span', null, s))), aside ? h('span', { class: 'hta' }, aside) : null); }
   function pageHead(kicker, title, sub) { return h('div', { class: 'page-head' }, h('div', { class: 'mono' }, kicker), h('h1', null, title), sub && h('p', null, sub)); }
   function hl(text, q) {
     if (!q) return text;
@@ -108,7 +110,7 @@
 
   /* ---------- routes ---------- */
   const ROUTES = [
-    ['', 'My desk', dashboard, 'home', 1], ['inspect', 'Inspect', inspectPage, 'inspect', 1], ['batch', 'Batch', batchPage, 'batch', 1], ['submit', 'Submit', submitPage, 'denials', 1], ['setup', 'Setup', setupPage, 'setup', 1],
+    ['', 'My desk', dashboard, 'home', 1], ['inspect', 'Check a claim', inspectPage, 'inspect', 1], ['batch', 'Check a batch', batchPage, 'batch', 1], ['submit', 'Submit claims', submitPage, 'denials', 1], ['setup', 'Setup', setupPage, 'setup', 1],
     ['guides', 'Guides', home, 'ref', 2], ['match', 'Match', matchPage, 'match', 2], ['em', 'E/M level', emPage, 'em', 2],
     ['modifiers', 'Modifiers', modPage, 'mod', 2], ['capture', 'Capture', capturePage, 'capture', 2], ['preventive', 'Preventive', prevPage, 'prev', 2],
     ['programs', 'Programs', programsPage, 'programs', 2], ['denials', 'Denials', denialsPage, 'denials', 2], ['codes', 'Codes', codesPage, 'codes', 2], ['reference', 'Reference', refPage, 'ref', 2]
@@ -258,7 +260,7 @@
     }
     function demoActivity() { demoActivityFor(providers().map((p) => p.id)); }
     render();
-    root.appendChild(demoBanner());
+    add(root, demoBanner());
     root.appendChild(body);
     return root;
   }
@@ -283,7 +285,8 @@
   function home() {
     const done = store.get('rcm', {});
     const root = h('div', null);
-    root.appendChild(pageHead('Guides', 'The reference shelf.', 'Everything that is not a claim in front of you: the tools that explain, the schedules, the playbooks and the end-to-end cycle.'));
+    root.appendChild(pageHead('Guides', 'The reference shelf.', 'Tools that explain, schedules, playbooks and the end-to-end cycle.'));
+    root.appendChild(howTo(['Use these when a finding needs context or you are deciding how to code something', 'Each guide links back into the checker where it applies']));
     if (false) root.appendChild(h('a', { class: 'banner', href: '#/setup' }, ico('setup'), h('span', null, h('b', null, 'Set up your provider first. '), 'NPI, taxonomy, CLIA, the services you do and your go-to codes - then every tab is tuned to you.'), ico('arrow')));
     if (false) root.appendChild(h('section', { class: 'hero grid' },
       h('div', { class: 'c7' },
@@ -479,7 +482,7 @@
     const tplOk = (t) => !t.c || !hasProfile() || t.c.lines.every((l) => { const s = CI.serviceOf(l[0]); return !s.length || s.some((x) => does.has(x) || (CI.SERVICES.find((y) => y.id === x) || {}).core); });
     const tiles = h('div', { class: 'tiles' }, CI.TEMPLATES.filter(tplOk).map((t) => h('button', { class: 'tile', onclick: () => { claim = t.c ? sampleClaim({ c: t.c }) : blankClaim(); claim.cid = ''; renderForm(); run(); toast(t.name + ' loaded'); } }, ico(t.icon, 'big'), h('b', null, t.name), h('span', { class: 'xs muted' }, t.sub))));
     const root = h('div', null, dl1, dl2,
-      pageHead('01 · Scrubber', 'Inspect a claim.', 'Start from a visit type, change what differs, read the verdict.'), demoBanner(),
+      pageHead('Check a claim', 'Check one claim before it goes out.', 'The scrubber runs ~100 payer rules on a single visit.'), howTo(['Pick a visit type below (or load a sample / start blank)', 'Edit patient, diagnoses and service lines - the verdict updates as you type', 'Press “Fix it” on findings, then “Add to submission file” when the score is clean'], 'Nothing leaves this browser'), demoBanner(),
       tiles,
       h('div', { class: 'grid', style: 'margin-top:32px' }, h('div', { class: 'c7' }, formHost), h('div', { class: 'c5' }, h('div', { class: 'sticky' }, results))));
     renderForm(); run();
@@ -593,7 +596,7 @@
     ta.addEventListener('input', () => { clearTimeout(ta._t); ta._t = setTimeout(analyze, 250); });
     const file = h('input', { type: 'file', accept: '.txt,.csv,.tsv', style: 'display:none', onchange: (e) => { const f = e.target.files[0]; if (!f) return; f.text().then((t) => { ta.value = t; analyze(); }); } });
     const root = h('div', null,
-      pageHead('02 · Batch', 'Fifteen claims. One pass.', 'Paste the day, one claim per line. Worst first, safe fixes in one click, CSV out.'), demoBanner(),
+      pageHead('Check a batch', 'Check the whole day at once.', 'Paste or upload many claims; get a ranked worklist.'), howTo(['Paste claims one per line (format on the right) or upload a .txt/.csv', 'Read the scoreboard - blocked claims are listed first', 'Press “Fix safely” for the mechanical fixes, open the rest in Check a claim, copy the CSV for your biller']), demoBanner(),
       h('div', { class: 'grid' },
         h('div', { class: 'c8' }, h('div', { class: 'card' },
           h('div', { class: 'row between', style: 'margin-bottom:12px' }, h('h3', { class: 'h3' }, 'Claims'), h('div', { class: 'row' },
@@ -641,7 +644,7 @@
       if (!prac.groupNpi || !prac.taxId || !prac.submitterId) host.appendChild(h('a', { class: 'banner', href: '#/setup', style: 'margin-top:24px' }, ico('setup'), h('span', null, h('b', null, 'Practice details incomplete. '), 'Billing NPI, tax ID and clearinghouse submitter/receiver IDs go in Setup → Practice; the 837P needs them.'), ico('arrow')));
     }
     render();
-    return h('div', null, pageHead('Submit', 'Build the file, print the forms.', 'Claims you added from the Inspector. The 837P is the standard electronic format clearinghouses accept; the CMS-1500 print is a review facsimile - paper claims must go on the official red-ink form.'), host);
+    return h('div', null, pageHead('Submit claims', 'Send what is ready.', 'Claims you added from Check a claim, with their patient and insurance details.'), howTo(['Each claim shows whether it is ready (rules clean + form complete) or what is missing', 'Download the 837P and upload it to your clearinghouse - or print CMS-1500s for paper payers', 'Press Clear once the file is accepted'], 'CMS-1500 print is a facsimile - paper claims go on the official red form'), host);
   }
 
   /* ---------- Provider setup ---------- */
@@ -731,7 +734,7 @@
     }
     if (!hasProfile()) { p.id = uid(); p.code = 'P1'; saveProfile(p); }
     renderProvBar(); renderForm(); renderSide();
-    const root = h('div', null, pageHead('00 · Setup', 'Tell it who you are.', 'Practice once, each provider once. Then every tab defaults to you and the scrubber knows what each clinician can bill.'),
+    const root = h('div', null, pageHead('Setup', 'Tell it who you are.', 'Done once per practice and once per provider.'), howTo(['Add each provider: name, NPI, specialty, CLIA, the services they do and their go-to codes', 'Fill the practice block: billing NPI, tax ID, address, clearinghouse IDs (needed for the 837P)', 'Pick the active provider - new claims default to them; use @CODE in a batch to route lines']),
       h('div', { class: 'grid' }, h('div', { class: 'c7 stack-lg' }, provBar, form, practiceCard), h('div', { class: 'c5' }, side)));
     return root;
   }
