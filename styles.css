@@ -520,3 +520,30 @@ select.in.skin { width: auto; height: 32px; padding: 0 28px 0 10px; font-size: 1
 :root[data-skin="graphite"] ::selection { background: var(--violet); color: #0B0D12; }
 
 /* 5 · MIDNIGHT - the original editorial look (Sora, violet + lime), follows system light/dark. */
+
+/* Clinic refinements */
+:root[data-skin="clinic"] .brand em { color: var(--violet); }
+:root[data-skin="clinic"] .mono { letter-spacing: .04em; }
+:root[data-skin="clinic"] .nav { background: #fff; }
+:root[data-skin="clinic"] .navlbl { color: #CBD5E1; }
+:root[data-skin="clinic"] .statstrip { border-radius: 10px; border: 1px solid var(--border); background: #fff; overflow: hidden; }
+:root[data-skin="clinic"] .stat { border-right-color: var(--border); }
+:root[data-skin="clinic"] .howto { border-style: solid; background: #fff; }
+:root[data-skin="clinic"] .banner.demo { background: var(--violet-t); border: 1px solid #BFDBFE; }
+:root[data-skin="clinic"] .card.dark .btn.ghost { color: var(--on-dark); border-color: #334155; }
+:root[data-skin="clinic"] .result .modbig { color: #60A5FA; }
+:root[data-skin="clinic"] .tool.wide { background: var(--violet); border-color: var(--violet); }
+:root[data-skin="clinic"] .tool.wide .mono, :root[data-skin="clinic"] .tool.wide p { color: #DBEAFE; }
+:root[data-skin="clinic"] .tool.wide .go { background: #fff; color: var(--violet); }
+:root[data-skin="clinic"] .tool.wide .ico.big { color: #fff; }
+:root[data-skin="clinic"] .score.good { color: var(--violet); }
+:root[data-skin="clinic"] .card.dark .score.good { color: #60A5FA; }
+:root[data-skin="clinic"] .footer { background: #0F172A; }
+:root[data-skin="clinic"] .chip:hover { border-color: var(--violet); color: var(--violet); }
+:root[data-skin="clinic"] .in:focus { box-shadow: 0 0 0 3px #BFDBFE; }
+:root[data-skin="clinic"] .search input:focus { box-shadow: 0 0 0 3px #BFDBFE; }
+/* fixes: tool-card arrow clearance; banner icon alignment */
+.tool p { padding-right: 48px; }
+.tool.wide p { padding-right: 56px; }
+.banner > .ico { flex: none; }
+.banner > span:not(.ico) { flex: 1; }

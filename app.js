@@ -1071,10 +1071,10 @@
   const SKINS = [['paper', 'Paper'], ['clinic', 'Clinic'], ['sage', 'Sage'], ['graphite', 'Graphite'], ['midnight', 'Midnight']];
   const SKIN_MODE = { paper: 'light', clinic: 'light', sage: 'light', graphite: 'dark', midnight: '' };
   function applySkin(s) { const r = document.documentElement; r.dataset.skin = s; if (SKIN_MODE[s]) r.dataset.theme = SKIN_MODE[s]; else delete r.dataset.theme; store.set('skin', s); }
-  const skinSel = sel(SKINS, store.get('skin', 'paper'), (v) => { applySkin(v); route(); }, 'skin');
+  const skinSel = sel(SKINS, store.get('skin', 'clinic'), (v) => { applySkin(v); route(); }, 'skin');
   skinSel.setAttribute('aria-label', 'Look');
   const themeBtn = document.getElementById('theme'); themeBtn.replaceWith(skinSel);
-  applySkin(new URLSearchParams(location.search).get('skin') || store.get('skin', 'paper'));
+  applySkin(new URLSearchParams(location.search).get('skin') || store.get('skin', 'clinic'));
   renderWho();
   route();
 })();
