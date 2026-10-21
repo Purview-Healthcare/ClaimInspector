@@ -1,6 +1,6 @@
 # Claim Inspector
 
-Offline revenue-cycle workbench for **family medicine**. Open `index.html` in a browser (no build, no server, nothing leaves the device).
+Offline revenue-cycle workbench for **family medicine**. Open `index.html` in a browser (no build, no server, nothing leaves the device). Live site: https://purview-healthcare.github.io/ClaimInspector/ (once GitHub Pages is enabled - see Launch).
 
 | Tab | What it does |
 |---|---|
@@ -21,8 +21,8 @@ Offline revenue-cycle workbench for **family medicine**. Open `index.html` in a 
 
 ## Launch
 
-- **GitHub Pages:** Settings → Pages → Source *GitHub Actions*, then run the *Deploy Claim Inspector to GitHub Pages* workflow (it also runs automatically on pushes to `main`/`master` that touch `claim-inspector/`). The app is served from `claim-inspector/` as a static site.
-- **Any static host** (Netlify, Vercel, S3, an intranet server): upload the `claim-inspector/` folder as-is. No build step, no backend.
+- **GitHub Pages:** Settings → Pages → Source *GitHub Actions*, then run the *Deploy Claim Inspector to GitHub Pages* workflow (it also runs automatically on pushes to `main`/`master` ). The app is served from the repository root as a static site.
+- **Any static host** (Netlify, Vercel, S3, an intranet server): upload the repository contents as-is. No build step, no backend.
 - It is a PWA: once opened over HTTPS it can be installed on desktop or phone and works offline (service worker caches the app shell).
 
 `engine.js` is a pure module (works in Node): `node test/engine.test.js`.
