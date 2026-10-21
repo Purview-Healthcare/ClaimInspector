@@ -104,7 +104,7 @@
   }
   function gauge(score, size) {
     size = size || 120; const r = (size - 12) / 2, c = 2 * Math.PI * r, pct = Math.max(0, Math.min(100, score)) / 100;
-    const col = score >= 85 ? 'var(--lime)' : score >= 60 ? '#E5A93C' : 'var(--red)';
+    const col = score >= 85 ? 'var(--lime)' : score >= 60 ? 'var(--amber)' : 'var(--red)';
     return h('div', { class: 'gauge', style: 'width:' + size + 'px;height:' + size + 'px', html: '<svg viewBox="0 0 ' + size + ' ' + size + '"><circle cx="' + size / 2 + '" cy="' + size / 2 + '" r="' + r + '" stroke="rgba(139,147,161,.25)" stroke-width="10" fill="none"/><circle cx="' + size / 2 + '" cy="' + size / 2 + '" r="' + r + '" stroke="' + col + '" stroke-width="10" fill="none" stroke-linecap="round" stroke-dasharray="' + (c * pct) + ' ' + c + '" transform="rotate(-90 ' + size / 2 + ' ' + size / 2 + ')"/></svg><div class="gv">' + score + '</div>' });
   }
 
@@ -210,8 +210,8 @@
           h('span', { class: 'h4', style: 'color:' + (e.errs ? 'var(--red)' : e.warns ? 'var(--amber)' : 'var(--violet)') }, e.kind === 'submit' ? money(e.value || 0) : String(e.score)))) : h('p', { class: 'small muted', style: 'padding:0 24px 24px' }, 'Nothing yet.')));
       // right column
       const readyQ = queue.length;
-      right.appendChild(h('div', { class: 'card dark' }, h('div', { class: 'mono' }, 'Submission file'), h('div', { class: 'score good', style: 'font-size:56px;margin:8px 0 4px' }, String(readyQ)), h('div', { class: 'small', style: 'color:#B6BCC8' }, readyQ ? 'claims waiting to be sent' : 'empty - add claims from the Inspector'),
-        h('div', { class: 'row', style: 'margin-top:16px' }, h('a', { class: 'btn lime sm', href: '#/submit' }, 'Open file'), h('a', { class: 'btn ghost sm', style: 'color:#fff;border-color:#2B3445', href: '#/inspect' }, 'New claim'))));
+      right.appendChild(h('div', { class: 'card dark' }, h('div', { class: 'mono' }, 'Submission file'), h('div', { class: 'score good', style: 'font-size:56px;margin:8px 0 4px' }, String(readyQ)), h('div', { class: 'small', style: 'color:var(--on-dark-2)' }, readyQ ? 'claims waiting to be sent' : 'empty - add claims from the Inspector'),
+        h('div', { class: 'row', style: 'margin-top:16px' }, h('a', { class: 'btn lime sm', href: '#/submit' }, 'Open file'), h('a', { class: 'btn ghost sm', style: 'color:var(--on-dark);border-color:var(--dark-border)', href: '#/inspect' }, 'New claim'))));
       // money on the table
       const opp = opportunities(mine);
       right.appendChild(h('div', { class: 'card' }, h('div', { class: 'row', style: 'gap:8px' }, ico('dollar', 'big'), h('div', null, h('div', { class: 'mono' }, 'Left on the table'), h('h3', { class: 'h3' }, opp.total ? '≈ ' + money(opp.total) : 'Nothing obvious'))),
@@ -383,14 +383,14 @@
       results.appendChild(h('div', { class: 'row between', style: 'align-items:center' },
         gauge(r.score, 112),
         h('div', { class: 'stack-sm', style: 'flex:1;min-width:160px' },
-          h('div', { class: 'h3', style: 'color:#fff' }, good ? (r.warns ? 'Review, then submit' : 'Ready to submit') : 'Blocked - fix errors'),
+          h('div', { class: 'h3', style: 'color:var(--on-dark)' }, good ? (r.warns ? 'Review, then submit' : 'Ready to submit') : 'Blocked - fix errors'),
           h('div', { class: 'row', style: 'gap:6px' }, r.errs ? h('span', { class: 'pill red' }, r.errs + ' errors') : null, r.warns ? h('span', { class: 'pill amber' }, r.warns + ' warnings') : null, r.infos ? h('span', { class: 'pill violet' }, r.infos + ' notes') : null, !r.issues.length ? h('span', { class: 'pill lime' }, 'clean') : null),
           val ? h('div', { class: 'mono' }, '≈ ' + money(val) + ' est. value') : null)));
-      results.appendChild(h('hr', { class: 'rule', style: 'border-color:#1F2937' }));
+      results.appendChild(h('hr', { class: 'rule', style: 'border-color:var(--dark-border)' }));
       results.appendChild(h('div', { class: 'row', style: 'margin-bottom:8px' },
         h('button', { class: 'btn lime sm', onclick: () => copy(report()) }, 'Copy report'),
-        h('button', { class: 'btn ghost sm', style: 'color:#fff;border-color:#2B3445', onclick: () => window.print() }, 'Print')));
-      if (!r.issues.length) results.appendChild(h('p', { class: 'small', style: 'color:#C7F36B' }, 'No issues found. Ready to submit.'));
+        h('button', { class: 'btn ghost sm', style: 'color:var(--on-dark);border-color:var(--dark-border)', onclick: () => window.print() }, 'Print')));
+      if (!r.issues.length) results.appendChild(h('p', { class: 'small', style: 'color:var(--lime)' }, 'No issues found. Ready to submit.'));
       const order = { error: 0, warn: 1, info: 2 };
       const fixable = r.issues.filter((i) => i.fix && i.fix.type !== 'note' && i.fix.type !== 'suggestDx');
       if (fixable.length > 1) results.appendChild(h('button', { class: 'btn lime', style: 'margin-bottom:8px', onclick: () => { let c = toEngine(claim); for (let k = 0; k < 3; k++) { const rr = E.inspect(c); const fx = rr.issues.filter((i) => i.fix && i.fix.type !== 'note' && i.fix.type !== 'suggestDx'); if (!fx.length) break; fx.forEach((i) => { c = E.applyFix(c, i); }); } claim = fromEngine(c); renderForm(); run(); toast('Fixes applied'); } }, ico('fix'), 'Fix all ' + fixable.length));
@@ -557,14 +557,14 @@
         h('div', { class: 'row between', style: 'align-items:flex-end' },
           h('div', { class: 'row', style: 'gap:40px;align-items:flex-end' },
             h('div', null, h('div', { class: 'score good' }, String(ok.length)), h('div', { class: 'mono' }, 'claims reviewed')),
-            total ? h('div', null, h('div', { class: 'score', style: 'font-size:48px;color:#fff' }, money(atRisk)), h('div', { class: 'mono' }, 'at risk of ≈ ' + money(total))) : null,
+            total ? h('div', null, h('div', { class: 'score', style: 'font-size:48px;color:var(--on-dark)' }, money(atRisk)), h('div', { class: 'mono' }, 'at risk of ≈ ' + money(total))) : null,
             h('div', null, h('div', { class: 'score', style: 'font-size:48px;color:var(--red)' }, String(bad.length)), h('div', { class: 'mono' }, 'blocked by errors')),
-            h('div', null, h('div', { class: 'score', style: 'font-size:48px;color:#E5A93C' }, String(warn.length)), h('div', { class: 'mono' }, 'need a look')),
+            h('div', null, h('div', { class: 'score', style: 'font-size:48px;color:var(--amber)' }, String(warn.length)), h('div', { class: 'mono' }, 'need a look')),
             h('div', null, h('div', { class: 'score', style: 'font-size:48px;color:var(--lime)' }, String(clean.length)), h('div', { class: 'mono' }, 'ready to submit'))),
           h('div', { class: 'row' },
             h('button', { class: 'btn lime', disabled: fixable === 0, onclick: fixAll }, ico('fix'), 'Fix ' + fixable + ' safely'),
-            h('button', { class: 'btn ghost', style: 'color:#fff;border-color:#2B3445', onclick: () => copy(csv()) }, 'Copy results CSV'),
-            h('button', { class: 'btn ghost', style: 'color:#fff;border-color:#2B3445', onclick: () => window.print() }, 'Print')))));
+            h('button', { class: 'btn ghost', style: 'color:var(--on-dark);border-color:var(--dark-border)', onclick: () => copy(csv()) }, 'Copy results CSV'),
+            h('button', { class: 'btn ghost', style: 'color:var(--on-dark);border-color:var(--dark-border)', onclick: () => window.print() }, 'Print')))));
       list.innerHTML = '';
       list.appendChild(h('div', { class: 'chips', style: 'margin:32px 0 16px' }, [['All', results.length], ['Errors', bad.length], ['Warnings', warn.length], ['Ready', clean.length]].map((f) => h('button', { class: 'chip', 'aria-pressed': filter === f[0], onclick: () => { filter = f[0]; render(); } }, f[0] + ' · ' + f[1]))));
       const rank = (p) => !p.res ? -1 : p.res.errs * 100 + p.res.warns * 10 + p.res.infos;
@@ -624,13 +624,13 @@
       host.appendChild(h('div', { class: 'card dark' }, h('div', { class: 'row between', style: 'align-items:flex-end' },
         h('div', { class: 'row', style: 'gap:40px;align-items:flex-end' },
           h('div', null, h('div', { class: 'score good' }, String(items.length)), h('div', { class: 'mono' }, 'claims in file')),
-          h('div', null, h('div', { class: 'score', style: 'font-size:48px;color:' + (ready.length === items.length ? 'var(--lime)' : '#E5A93C') }, String(ready.length)), h('div', { class: 'mono' }, 'ready to send')),
-          h('div', null, h('div', { class: 'score', style: 'font-size:48px;color:#fff' }, money(tot)), h('div', { class: 'mono' }, 'total charges'))),
+          h('div', null, h('div', { class: 'score', style: 'font-size:48px;color:' + (ready.length === items.length ? 'var(--lime)' : 'var(--amber)') }, String(ready.length)), h('div', { class: 'mono' }, 'ready to send')),
+          h('div', null, h('div', { class: 'score', style: 'font-size:48px;color:var(--on-dark)' }, money(tot)), h('div', { class: 'mono' }, 'total charges'))),
         h('div', { class: 'row' },
           h('button', { class: 'btn lime', disabled: !ready.length, onclick: () => { download('claims-' + today() + '.837', CI.forms.x837(ready, PRACTICE())); ready.forEach((it) => logActivity(actEntry('s:' + it.q.id, 'submit', it.q.claim, it.res))); toast(ready.length + ' claims logged as submitted'); } }, ico('batch'), 'Download 837P (' + ready.length + ')'),
-          h('button', { class: 'btn ghost', style: 'color:#fff;border-color:#2B3445', disabled: !ready.length, onclick: () => download('claims-' + today() + '.csv', CI.forms.csv(ready)) }, 'CSV'),
-          h('button', { class: 'btn ghost', style: 'color:#fff;border-color:#2B3445', disabled: !items.length, onclick: () => printForm(items) }, 'Print all CMS-1500'),
-          h('button', { class: 'btn ghost', style: 'color:#fff;border-color:#2B3445', disabled: !items.length, onclick: () => { if (confirm('Clear the submission file? (Download first.)')) { store.set('queue', []); render(); } } }, 'Clear')))));
+          h('button', { class: 'btn ghost', style: 'color:var(--on-dark);border-color:var(--dark-border)', disabled: !ready.length, onclick: () => download('claims-' + today() + '.csv', CI.forms.csv(ready)) }, 'CSV'),
+          h('button', { class: 'btn ghost', style: 'color:var(--on-dark);border-color:var(--dark-border)', disabled: !items.length, onclick: () => printForm(items) }, 'Print all CMS-1500'),
+          h('button', { class: 'btn ghost', style: 'color:var(--on-dark);border-color:var(--dark-border)', disabled: !items.length, onclick: () => { if (confirm('Clear the submission file? (Download first.)')) { store.set('queue', []); render(); } } }, 'Clear')))));
       const list = h('div', { class: 'card', style: 'padding:0;overflow:hidden;margin-top:24px' });
       if (!items.length) list.appendChild(h('p', { class: 'small muted', style: 'padding:24px' }, 'Empty. On the Inspector, open “Claim form”, fill the patient block and press “Add to submission file”.'));
       items.forEach((it) => list.appendChild(h('div', { style: 'display:grid;grid-template-columns:24px 1fr auto;gap:16px;align-items:center;padding:16px 24px;border-top:1px solid var(--border)' },
@@ -727,9 +727,9 @@
       ];
       const ex = () => { const blob = new Blob([JSON.stringify(p, null, 2)], { type: 'application/json' }); const a = h('a', { href: URL.createObjectURL(blob), download: 'claim-inspector-profile.json' }); document.body.appendChild(a); a.click(); a.remove(); };
       const file = h('input', { type: 'file', accept: '.json', style: 'display:none', onchange: (e) => { const f = e.target.files[0]; if (!f) return; f.text().then((t) => { try { p = Object.assign(CI.blankProfile(), JSON.parse(t), { id: p.id, code: JSON.parse(t).code || p.code }); saveProfile(p); renderProvBar(); renderForm(); renderSide(); toast('Profile imported'); } catch (err) { toast('Not a valid profile file'); } }); } });
-      side.appendChild(h('div', { class: 'card dark' }, h('div', { class: 'mono' }, 'Profile'), h('div', { class: 'h2', style: 'margin:8px 0 4px;color:#fff' }, p.name || 'Unnamed provider'), h('div', { class: 'mono' }, [p.credential, p.npi && 'NPI ' + p.npi, CI.SPECIALTIES[p.specialty] && CI.SPECIALTIES[p.specialty].label].filter(Boolean).join(' · ')),
+      side.appendChild(h('div', { class: 'card dark' }, h('div', { class: 'mono' }, 'Profile'), h('div', { class: 'h2', style: 'margin:8px 0 4px;color:var(--on-dark)' }, p.name || 'Unnamed provider'), h('div', { class: 'mono' }, [p.credential, p.npi && 'NPI ' + p.npi, CI.SPECIALTIES[p.specialty] && CI.SPECIALTIES[p.specialty].label].filter(Boolean).join(' · ')),
         h('ul', { class: 'mini-findings', style: 'margin-top:16px' }, checks.map((c) => h('li', null, ico(c[0], 'sev ' + c[0]), h('b', { style: 'flex:1' }, c[1])))),
-        h('div', { class: 'row', style: 'margin-top:16px' }, h('button', { class: 'btn lime sm', onclick: ex }, 'Export'), h('button', { class: 'btn ghost sm', style: 'color:#fff;border-color:#2B3445', onclick: () => file.click() }, 'Import'), h('button', { class: 'btn ghost sm', style: 'color:#fff;border-color:#2B3445', onclick: () => { if (confirm('Clear the saved provider profile?')) { try { localStorage.removeItem('ci.profile'); localStorage.removeItem('ci.providers'); localStorage.removeItem('ci.activeProvider'); } catch (e) { /* ignore */ } p = PROF(); p.id = uid(); p.code = 'P1'; saveProfile(p); renderProvBar(); renderWho(); renderForm(); renderSide(); } } }, 'Reset'), file)));
+        h('div', { class: 'row', style: 'margin-top:16px' }, h('button', { class: 'btn lime sm', onclick: ex }, 'Export'), h('button', { class: 'btn ghost sm', style: 'color:var(--on-dark);border-color:var(--dark-border)', onclick: () => file.click() }, 'Import'), h('button', { class: 'btn ghost sm', style: 'color:var(--on-dark);border-color:var(--dark-border)', onclick: () => { if (confirm('Clear the saved provider profile?')) { try { localStorage.removeItem('ci.profile'); localStorage.removeItem('ci.providers'); localStorage.removeItem('ci.activeProvider'); } catch (e) { /* ignore */ } p = PROF(); p.id = uid(); p.code = 'P1'; saveProfile(p); renderProvBar(); renderWho(); renderForm(); renderSide(); } } }, 'Reset'), file)));
       side.appendChild(h('div', { class: 'card flat' }, h('div', { class: 'mono' }, 'What this changes'), h('ul', { class: 'plain dash', style: 'margin-top:8px' }, ['Inspector and Batch default to your taxonomy, POS and payers', 'Templates hide services you don\'t do; go-to codes become one-tap chips', 'Claims get extra checks: NPI check digit, CLIA for in-office labs, services outside your list, specialty age range, payers you aren\'t enrolled with', 'Stays in this browser only - export to move it'].map((x) => h('li', null, x)))));
     }
     if (!hasProfile()) { p.id = uid(); p.code = 'P1'; saveProfile(p); }
@@ -826,7 +826,7 @@
       out.appendChild(h('div', { class: 'mono' }, 'Result · ' + (status === 'new' ? 'new patient' : 'established patient') + (st.months !== '' ? ' (' + st.months + ' months since last visit)' : '')));
       out.appendChild(h('div', { class: 'row', style: 'margin:16px 0;gap:32px;align-items:flex-end' },
         h('div', null, h('div', { class: 'score good' }, mdmCode), h('div', { class: 'mono' }, 'by MDM · ' + names[lvl])),
-        tm && tm.code ? h('div', null, h('div', { class: 'score', style: 'font-size:48px;color:#fff' }, tm.code), h('div', { class: 'mono' }, 'by time · ' + st.min + ' min')) : null));
+        tm && tm.code ? h('div', null, h('div', { class: 'score', style: 'font-size:48px;color:var(--on-dark)' }, tm.code), h('div', { class: 'mono' }, 'by time · ' + st.min + ' min')) : null));
       const best = tm && tm.code && tm.code > mdmCode ? tm.code : mdmCode;
       out.appendChild(h('p', { class: 'small' }, h('b', null, 'Bill ' + best), ' - choose whichever method supports the higher level, and document it. ', tm && tm.code && tm.code > mdmCode ? 'Time supports a higher level than MDM here.' : tm && tm.code && tm.code < mdmCode ? 'MDM supports a higher level than time.' : ''));
       const sec = (title, lines) => h('div', { style: 'margin-top:24px' }, h('div', { class: 'mono' }, title), lines.map((l) => h('p', { class: 'small', style: 'margin:8px 0 0' }, l)));
@@ -867,9 +867,9 @@
       n.a.forEach((a) => wiz.appendChild(h('button', { class: 'opt', onclick: () => {
         if (a.next) { path.push(a.next); show(a.next); } else {
           wiz.innerHTML = '';
-          wiz.appendChild(h('div', { class: 'result' }, h('div', { class: 'mono', style: 'color:#C7F36B' }, 'Recommendation'),
+          wiz.appendChild(h('div', { class: 'result' }, h('div', { class: 'mono', style: 'color:var(--lime)' }, 'Recommendation'),
             h('div', { class: 'modbig', style: 'margin:12px 0' }, a.result.mod === 'none' ? 'No modifier' : a.result.mod),
-            a.result.on && h('div', { class: 'mono' }, 'Append to · ' + a.result.on), h('p', { style: 'margin:16px 0 0;color:#E8EBF2' }, a.result.why)));
+            a.result.on && h('div', { class: 'mono' }, 'Append to · ' + a.result.on), h('p', { style: 'margin:16px 0 0;color:var(--on-dark)' }, a.result.why)));
           wiz.appendChild(h('button', { class: 'btn ghost', style: 'margin-top:16px', onclick: () => { path.length = 0; show('start'); } }, 'Start over'));
         }
       } }, a.t)));
@@ -903,8 +903,8 @@
       if (!picked.length) { out.appendChild(h('p', { class: 'small', style: 'margin-top:16px' }, 'Tick what happened during the visit.')); return; }
       out.appendChild(h('div', { class: 'score good', style: 'margin:12px 0 4px;font-size:64px' }, String(picked.reduce((n, c) => n + c.codes.length, 0))));
       out.appendChild(h('div', { class: 'mono' }, 'codes to consider'));
-      picked.forEach((c) => out.appendChild(h('div', { class: 'issue', style: 'border-color:#1F2937;grid-template-columns:1fr' }, h('div', null, h('div', { class: 'h4', style: 'color:#fff' }, c.label),
-        c.codes.map((x) => h('div', { class: 'row', style: 'gap:12px;margin-top:8px;align-items:baseline' }, h('span', { class: 'code', style: 'color:#C7F36B;min-width:96px' }, x[0]), h('span', { class: 'small' }, x[1]), x[2] && h('span', { class: 'pill dark', style: 'border:1px solid #2B3445' }, x[2]))),
+      picked.forEach((c) => out.appendChild(h('div', { class: 'issue', style: 'border-color:var(--dark-border);grid-template-columns:1fr' }, h('div', null, h('div', { class: 'h4', style: 'color:var(--on-dark)' }, c.label),
+        c.codes.map((x) => h('div', { class: 'row', style: 'gap:12px;margin-top:8px;align-items:baseline' }, h('span', { class: 'code', style: 'color:var(--lime);min-width:96px' }, x[0]), h('span', { class: 'small' }, x[1]), x[2] && h('span', { class: 'pill dark', style: 'border:1px solid var(--dark-border)' }, x[2]))),
         h('div', { class: 'mono', style: 'margin-top:8px' }, 'Dx · ' + c.dx)))));
       out.appendChild(h('p', { class: 'xs muted', style: 'margin-top:16px' }, 'Only bill what is documented, medically necessary and separately identifiable. Time counted toward E/M cannot be counted again toward counseling codes.'));
     }
@@ -1067,12 +1067,14 @@
   /* ---------- global wiring ---------- */
   document.getElementById('gsearch').addEventListener('submit', (e) => { e.preventDefault(); const v = document.getElementById('gq').value.trim(); if (v) location.hash = '#/search?q=' + encodeURIComponent(v); });
   document.addEventListener('keydown', (e) => { if (e.key === '/' && !/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName)) { e.preventDefault(); document.getElementById('gq').focus(); } });
-  document.getElementById('theme').addEventListener('click', () => {
-    const r = document.documentElement; const dark = r.dataset.theme ? r.dataset.theme === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
-    r.dataset.theme = dark ? 'light' : 'dark'; store.set('theme', r.dataset.theme);
-  });
-  const th = store.get('theme', null); if (th) document.documentElement.dataset.theme = th;
-  document.getElementById('theme').innerHTML = CI.ICON.sun;
+  /* Skins: each sets fonts, palette, radii and light/dark mode. */
+  const SKINS = [['paper', 'Paper'], ['clinic', 'Clinic'], ['sage', 'Sage'], ['graphite', 'Graphite'], ['midnight', 'Midnight']];
+  const SKIN_MODE = { paper: 'light', clinic: 'light', sage: 'light', graphite: 'dark', midnight: '' };
+  function applySkin(s) { const r = document.documentElement; r.dataset.skin = s; if (SKIN_MODE[s]) r.dataset.theme = SKIN_MODE[s]; else delete r.dataset.theme; store.set('skin', s); }
+  const skinSel = sel(SKINS, store.get('skin', 'paper'), (v) => { applySkin(v); route(); }, 'skin');
+  skinSel.setAttribute('aria-label', 'Look');
+  const themeBtn = document.getElementById('theme'); themeBtn.replaceWith(skinSel);
+  applySkin(new URLSearchParams(location.search).get('skin') || store.get('skin', 'paper'));
   renderWho();
   route();
 })();
